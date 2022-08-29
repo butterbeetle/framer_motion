@@ -26,50 +26,56 @@ const Box = styled(motion.div)`
 `;
 
 const box = {
-  invisible: {
-    x: 500,
+  entry: (isBack: boolean) => ({
+    x: isBack ? -500 : 500,
     opacity: 0,
     scale: 0,
-  },
-  visible: {
+  }),
+  center: {
     x: 0,
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 1,
+      duration: 0.3,
     }
   },
-  exit: {
-    x: -500,
+  exit: (isBack: boolean) => ({
+    x: isBack ? 500 : -500,
     opacity: 0,
     scale: 0,
     transition: {
-      duration: 1,
+      duration: 0.3,
     }
-  },
+  }),
 }
 
 function App() {
   const [visible, setVisible] = useState(1);
+  const [isBack, setIsBack] = useState(false);
   const nextBox = () => {
+    setIsBack(false);
     setVisible(prev => prev === 10 ? 1 : prev + 1);
+  }
+  const prevBox = () => {
+    setIsBack(true);
+    setVisible(prev => prev === 1 ? 10 : prev - 1);
   }
   return (
     <Wrapper>
-      <AnimatePresence> // 안쪽에 나타나거나 사라지는게 있는지 확인함
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-          i === visible ?
-            <Box
-              variants={box}
-              initial="invisible"
-              animate="visible"
-              exit="exit"
-              key={i}>
-              {i}
-            </Box> : null
-        ))}
+      <AnimatePresence custom={isBack}> // 안쪽에 나타나거나 사라지는게 있는지 확인함
+        <Box
+          custom={isBack}
+          variants={box}
+          initial="entry"
+          animate="center"
+          exit="exit"
+          key={visible}
+        >
+          {visible}
+        </Box>
       </AnimatePresence>
-      <button onClick={nextBox}>NEXT</button>
+      <button onClick={nextBox}>Next</button>
+      <button onClick={prevBox}>Prev</button>
     </Wrapper>
   );
 }
